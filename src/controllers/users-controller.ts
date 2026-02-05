@@ -22,13 +22,13 @@ class UsersController {
 
     const { name, email, password, role } = bodySchema.parse(request.body);
 
-    const userWithEmail = await prisma.user.findFirst({ where: { email } });
+    const userWithEmail = await prisma.user.findUnique({ where: { email } });
 
     if (userWithEmail) {
       throw new AppError("User with email already exists");
     }
 
-    const passwordHashed = await hash(email, 8);
+    const passwordHashed = await hash(password, 8);
 
     await prisma.user.create({
       data: {
