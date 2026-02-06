@@ -91,6 +91,32 @@ class RefundsController {
       },
     });
   }
+
+  async findById(request: Request, response: Response) {
+    const paramsSchema = z.object({
+      id: z.string(),
+    });
+
+    const { id } = paramsSchema.parse(request.params);
+
+    const userId = request.user?.id;
+    const userRole = request.user?.role;
+
+    const refund = await prisma.refunds.findUnique({
+      where: { id },
+      include: { user: { select: { name: true, email: true } } },
+    });
+
+    if (!refund) {
+      throw new AppError("Refund does not exists", 404);
+    }
+
+    if (userRole !== "manager" && refund.userId !== userId) {
+      throw new AppError("Unauthorized access to this refund", 401);
+    }
+
+    return response.json(refund);
+  }
 }
 
 export { RefundsController };
