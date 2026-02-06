@@ -12,4 +12,10 @@ refundsRoutes.post(
   refundsController.create,
 );
 
+refundsRoutes.get(
+  "/",
+  verifyAuthorization(["manager"]),
+  refundsController.index,
+);
+
 export { refundsRoutes };
